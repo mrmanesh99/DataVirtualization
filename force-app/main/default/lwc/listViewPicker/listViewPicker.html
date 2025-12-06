@@ -1,0 +1,20 @@
+<!-- Deleted file -->
+<template>
+    <template if:true={showMenu}>
+        <div class="container list-dropdown slds-box slds-m-top_small" role="listbox">
+            <lightning-input type="search" variant="label-hidden"
+                data-id="searchInput" placeholder="Search list views..." onchange={handleSearch}
+                class="search-input">
+            </lightning-input>
+            <template for:each={filteredListViews} for:item="lv">
+                <div key={lv.value} class="list-item slds-grid slds-grid_vertical-align-center slds-p-around_x-small"
+                     role="option" data-id={lv.value} onclick={handleMenuSelect}>
+                    <template if:true={lv.isSelected}>
+                        <lightning-icon icon-name="utility:check" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                    </template>
+                    <span class="slds-truncate">{lv.label}</span>
+                </div>
+            </template>
+        </div>
+    </template>
+</template>

@@ -1,0 +1,41 @@
+<template>
+    <div class="dropdown-container">
+        <template if:true={label}>
+            <label class="input-label">
+                <template if:true={isRequired}>
+                    <span class="slds-required">*</span>
+                </template>
+                {label}
+            </label>
+        </template>
+
+        <div class="search-input-wrapper">
+            <input type="text" class={computedInputClass} placeholder={placeholder} value={searchKey} title={searchKey}
+                disabled={isDisabled} readonly={isReadOnly} oninput={handleSearch} onclick={toggleDropdown}
+                onkeydown={handleKeyDown} />
+
+            <template if:true={selectedOption}>
+                <template if:true={showClearButton}>
+                    <button class="clear-button" onclick={clearSelection}>×</button>
+                </template>
+            </template>
+        </div>
+
+        <template if:true={isDropdownOpen}>
+            <ul class="dropdown-options">
+                <template for:each={filteredOptions} for:item="option">
+                    <li key={option.value} class="dropdown-option" onclick={handleSelect}>
+                        {option.label}
+                    </li>
+                </template>
+                <template if:true={isEmpty}>
+                    <li class="dropdown-no-result">No results found</li>
+                </template>
+            </ul>
+        </template>
+
+        <template if:true={showError}>
+            <div class="error-message">Complete this field.</div>
+        </template>
+    </div>
+</template>

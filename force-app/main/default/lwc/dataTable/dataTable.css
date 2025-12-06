@@ -1,0 +1,231 @@
+/* ------------------------- Base / Layout ------------------------- */
+.section {
+    /* background-color: white; */
+    border-radius: 4px;
+}
+
+.custom-box {
+    background-color: white;
+    border-radius: 4px;
+}
+
+.slds-box {
+    max-height: 12rem;
+    overflow-y: auto;
+}
+
+/* ------------------------- List View Picker ------------------------- */
+/* Default state */
+.list-item {
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* Hover → blue border + text */
+.list-item:hover {
+    border: 2px solid #0567b8;
+    color: black;
+    background-color: white; /* keep background white */
+}
+
+/* Selected state → stays highlighted */
+.list-item.selected {
+    background-color: #0176d3;
+    color: white;
+}
+
+/* Dropdown container */
+.list-dropdown {
+    position: absolute;        /* detach from normal flow */
+    z-index: 11;               /* higher than datatable */
+    background: white;
+    min-width: 40rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border-radius: 0.25rem;
+    margin-left: -100px;
+}
+
+/* ------------------------- Header / Actions ------------------------- */
+.header-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;                /* even spacing */
+    border-bottom: 1px solid #e5e5e5;    /* light divider like Salesforce */
+    background-color: #fff;
+}
+
+.header-div {
+    display: flex;
+    align-items: center;
+}
+
+.header-div lightning-icon {
+    margin-right: 0.5rem;
+}
+
+.header-div p.slds-text-title_bold {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* "Recently Viewed" alignment with dropdown + pin */
+.header-div .slds-grid_vertical-align-center {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.15rem;
+}
+
+/* Right-side actions: search + buttons + icons */
+.actions-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #0250D9;
+}
+
+.search-filter-div {
+    display: flex;
+    align-items: center;
+}
+
+/* Search input aligned compactly */
+.search-input {
+    width: 16rem;
+    max-width: 100%;
+    margin-right: 0.5rem;
+}
+
+/* ------------------------- Data Table / Pagination ------------------------- */
+.data-table-div {
+    display: flex;
+    flex-direction: column;
+}
+
+.pagination-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e5e5e5;
+    background-color: #f9f9f9;
+    padding: 0.75rem 1rem;
+}
+
+.pagination-div {
+    display: flex;
+    align-items: center;
+}
+
+/* ------------------------- Filter Panel ------------------------- */
+.filter-panel {
+    border: 1px solid #c9c9c9;
+}
+
+.filter-content {
+    position: relative;
+    padding: 12px 12px 0 12px;
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter-panel-header {
+    border: 1px solid #c9c9c9;
+}
+
+.filter-links {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter-section {
+    height: 8rem;
+    overflow: auto;
+}
+
+.filter-box {
+    background-color: #f9e3b6;
+    position: relative;
+}
+
+.filter-box:hover {
+    background-color: #f3f3f3;
+}
+
+/* Filter popover */
+.popover-style {
+    position: absolute;
+    left: -20rem;
+    top: -4rem;
+    --slds-c-popover-position-zindex: 1;
+}
+
+/* ------------------------- Modal ------------------------- */
+.modal-width {
+    width: 60rem;
+}
+
+.filterDiv {
+    border: 1px solid rgb(231 231 231);
+    border-radius: 0 0 .35rem .35rem;
+}
+ 
+.body-header {
+    border: 1px solid rgb(231 231 231);
+    border-radius: 0.75em 0.75em 0 0;
+}
+
+.edit-filter {
+    margin: -1rem 0.2rem -0.5rem;
+    cursor: pointer;
+}
+.locked-field {
+    background-color: #f8f9fa;
+    color: #6b6b6b;
+    font-style: italic;
+}
+
+
+.wrap-text .slds-truncate {
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+
+.clip-text .slds-truncate {
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+}
+
+/*  1. Hide pencil/edit icon for system fields */
+.lock-cell lightning-primitive-icon {
+    display: none !important;
+}
+
+/*  2. Hide lock icon by default */
+.lock-cell lightning-icon {
+    display: none !important;
+}
+
+/*  3. Show lock icon ONLY on row hover */
+.slds-hint-parent:hover .lock-cell lightning-icon {
+    display: inline-block !important;
+    margin-left: 4px;
+    opacity: 0.9;
+}

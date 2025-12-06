@@ -1,0 +1,216 @@
+<template>
+  <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+    class="slds-modal slds-fade-in-open slds-modal_small">
+    <div class="slds-modal__container slds-p-bottom_large custom-size-container">
+      <lightning-button-icon icon-name="utility:close" variant="bare-inverse" size="large"
+        class="slds-button slds-button_icon slds-mDaodal__close slds-button_icon-inverseslds-modal__close close-button"
+        onclick={handleCloseModal}>
+      </lightning-button-icon>
+      <div class="slds-modal__header">
+        <h1 class="slds-modal__title slds-hyphenate gitbookredirectionsection">
+          {popipTitle}
+          <span class="gitbookendpointsection"> <a class="help-link" target="_blank"
+              href="https://200ok.gitbook.io/200ok-documents/v/200-ok-user-manual/data-mapping-types"><lightning-button-icon
+                icon-name="utility:knowledge_base" 
+                alternative-text="Help"></lightning-button-icon></a></span>
+        </h1>
+      </div>
+
+      <section class="slds-modal__content slds-p-around_large">
+        <lightning-layout>
+          <lightning-layout-item if:true={layoutSectionOne} size={richTextSectionSize} class="border-around">
+            <div
+              class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_small mappingsection">
+              <span class="sub-title mapping-options-title" >Mapping Options </span>
+
+              <lightning-icon icon-name={iconName} class="mappingIcon" size="x-small" 
+                onclick={handleCloseSideBar}>
+              </lightning-icon>
+            </div>
+
+            <lightning-combobox if:true={isEtl} value="" placeholder="Select Options" options={etlPreLoadOptionsList}
+              onchange={setEtlChannelOptions}
+              class="select-preloads lightning-combobox slds-p-horizontal_small etltrue">
+            </lightning-combobox>
+
+            <lightning-combobox if:false={isEtl} value="" placeholder="Select Options" options={preLoadOptionsList}
+              onchange={setChannelOptions} class="select-preloads lightning-combobox slds-p-horizontal_small etlfalse">
+            </lightning-combobox>
+            <section class="slds-grid slds-p-horizontal_small slds-grid_vertical-align-center slds-grid_align-spread">
+              <lightning-combobox if:true={isIntegration} value="" placeholder="Select Options" options={preLoadOptions}
+                onchange={setLookupOptions} class="select-preload optionsload">
+              </lightning-combobox>
+
+              <template if:true={ischannelName}>
+                <lightning-input if:false={isChaining} class="preload-ids" disabled="true" type="text"
+                  value={channelData.name}></lightning-input>
+              </template>
+
+              <!-- <c-type-ahead-selection-mapping if:true={isChaining} if:false={ischannelName} place-holder={labelName}
+                class="preload-id" options={preloadlookupOptions} onchange={handlePreLoadInput} input-value="">
+              </c-type-ahead-selection-mapping> -->
+            </section>
+            <div class="slds-p-horizontal_small" if:false={hideJsonTextEditor}>
+              <textarea name="" id=""></textarea>              
+              <!-- <c-json-text-editor-map json-editor-data={jsonEditorData} ongetdata={handleFetchJsonData}
+                class="slds-p-horizontal_small" container-class="dataMapper">
+              </c-json-text-editor-map> -->
+            </div>
+          </lightning-layout-item>
+          <div class="slds-split-view_container" onclick={handleCloseSideBarnew} if:true={showLeftBar}>
+            <button
+              class="slds-button slds-button_icon slds-split-view__toggle-button slds-grid slds-grid_vertical-align-center split-view-toggle-button "
+              aria-controls="split-view-id" aria-expanded="false" onclick={handleCloseSideBar}>
+              <div if:true={showMapping} class="slds-grid slds-grid_vertical-align-center vertical-text-layout">
+                <lightning-icon icon-name={iconName} class="slds-m-bottom_small " size="x-small"
+                  onclick={handleCancel}>
+                </lightning-icon> Mapping Options
+              </div>
+            </button>
+          </div>
+          <lightning-layout-item size={bodySectionSize} class="auto-height border-around">
+            <div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center slds-p-horizontal_small mapping-editor-header">
+              <span class="sub-title">Mapping Editor</span>
+            </div>
+            <div class={operatorCss}>
+              <div class="slds-grid_vertical-align-center">
+                  <div class='action-container' if:true={enableInsertButtonSection}>
+                    <div onclick={toggleDropdown} class="slds-m-left_small dropdown-container">
+                      <p>Select Operators</p>
+                      <lightning-icon icon-name="utility:down" size="x-small" class="down-icon">
+                      </lightning-icon>
+                    </div>
+                    <ul class={dropdownClassFalse}>
+                      <template for:each={operatorOptions} for:item="option">
+                        <li data-id={option.label} key={option.label} onclick={handleSelectedOperator}>
+                          {option.label}
+                        </li>
+                      </template>
+                    </ul>
+                  </div>
+                <!-- <template lwc:if={enablePathSuggestions}>
+                  <div class="path-selection-insertion-main-section">
+                    <div class="selected-path-section slds-p-around_large path-selection-header"
+                      lwc:if={enableSelectedPath}>
+                      <div class="path-scroll-container" title={fullPath}>
+                        <template for:each={displaySelectedPath} for:item="item" for:index="index">
+                          <div class ="path-item" key={item.id} >
+                            <p data-valuename={item.reference} data-idvalue={item.id} onclick={handleClickSelectedPath}
+                            class="clickable-path">{item.label} </p>
+                            <lightning-icon lwc:if={item.isObject} icon-name="utility:right" size="xx-small">
+                            </lightning-icon>
+                          </div>
+                        </template>
+                      </div>
+                      <div if:true={enableInsertButtonSection} class="insert-button-enabled slds-grid slds-m-left_xxx-small" >
+                        <lightning-button label="Insert Path" onclick={handleSelectedJpath}
+                          class="select-button" size="small"></lightning-button>
+
+                          <div class="action-container" if:true={isAction}>
+                            <div onclick={toggleDropdown} class="dropdown-container">
+                              <p>Select Operators</p>
+                              <lightning-icon icon-name="utility:down" size="x-small" class="down-icon">
+                              </lightning-icon>
+                            </div>
+                            <ul class={dropdownClassTrue}>
+                              <template for:each={operatorOptions} for:item="option">
+                                <li data-id={option.label} key={option.label} onclick={handleSelectedOperator}>
+                                  {option.label}
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        
+                      </div>
+                    </div>
+                    <div class="path-selection-section path-selection-spacing slds-m-top_xxx-small" style="justify-content: space-between;">
+                      <div class="lookup-field-section action-container" style="width: 44%;">
+                        <c-ic-custom-lookup options={dataForChildLookUp} onselectoption={handleOptionSelect}
+                          source-data-mapper=true>
+                        </c-ic-custom-lookup> 
+                      </div>
+
+                      <div if:false={enableInsertButtonSection} class="slds-grid insert-path-container">
+                        <lightning-button label="Insert Path" onclick={handleSelectedJpath}
+                          class="select-button" size="small"></lightning-button>
+                          <div class='action-container' if:true={isAction}>
+                            <div onclick={toggleDropdown} class="slds-m-left_small dropdown-container">
+                              <p>Select Operators</p>
+                              <lightning-icon icon-name="utility:down" size="x-small" class="down-icon">
+                              </lightning-icon>
+                            </div>
+                            <ul class={dropdownClassFalse}>
+                              <template for:each={operatorOptions} for:item="option">
+                                <li data-id={option.label} key={option.label} onclick={handleSelectedOperator}>
+                                  {option.label}
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </template> -->
+                <template if:false={dataForChildLookUp}>
+                  <div class="slds-size_3-of-12" style="width: 100%;">
+                   
+                    <div class="dropdown" if:true={isAction}>
+                      <div onclick={toggleDropdown} class="operator-dropdown">
+                        <p>Select Operators</p>
+                        <lightning-icon icon-name="utility:down" size="x-small" class="down-icon">
+                        </lightning-icon>
+                      </div>
+                      <ul class={dropdownClass}>
+                        <template for:each={operatorOptions} for:item="option">
+                          <li data-id={option.label} key={option.label} onclick={handleSelectedOperator}>
+                            {option.label}
+                          </li>
+                        </template>
+                      </ul>
+                    </div>
+                  
+                  </div>
+                </template>
+              </div>
+            </div>
+            <section class="slds-grid slds-wrap slds-gutters_medium slds-var-m-left_small" if:true={isMetadata}>
+              <div class="playground-area">
+                <lightning-combobox if:true={isMetadata} label="Records" value="" placeholder="Select Record"
+                  options={lookupOptions} onchange={handleSelectedpattern} class="select-preloads">
+                </lightning-combobox>
+              </div>
+            </section>
+            <div class="textarea-div">
+              <div>
+                <textarea data-id="textArea" part="textarea" name="DataMapperInput"
+                  class="slds-textarea editble-textarea">{targetValue}</textarea>
+              </div>
+              <lightning-button if:true={enableInsertButton} label="Insert" icon-name="utility:edit" variant="brand"
+                onclick={handleFinalInsert} class="sldx-box copy-button" size="small">
+              </lightning-button>
+              <lightning-button label={copyLabel} icon-name={copyIcon} variant="brand" onclick={handleCopyToClipboard}
+                class="sldx-box copy-button">
+              </lightning-button>
+            </div>
+          </lightning-layout-item>
+          <!-- <div class="slds-split-view_container" if:true={showRightBar}>
+            <button
+              class="slds-button slds-button_icon slds-split-view__toggle-button slds-grid slds-grid_vertical-align-center split-view-toggle-button"
+              aria-controls="split-view-id" aria-expanded="false" onclick={handleCloseFunction}>
+              <div if:true={showFunction} class="slds-grid slds-grid_vertical-align-center vertical-text-layout">
+                <lightning-icon icon-name={rightIconName} class="slds-m-bottom_small "
+                  size="x-small" onclick={handleCancel}>
+                </lightning-icon> Functions
+              </div>
+            </button>
+          </div> -->
+
+          
+
+          
+        </lightning-layout>
+      </section>
+    </div>
+  </section>
+  <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+</template>

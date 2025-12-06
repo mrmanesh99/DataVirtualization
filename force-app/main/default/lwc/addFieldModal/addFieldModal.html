@@ -1,0 +1,38 @@
+<template>
+    <template if:true={isModalOpen}>
+        <!-- Modal -->
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <!-- Header -->
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Select Field</h2>
+                </header>
+
+                <!-- Body -->
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-dual-listbox 
+                        name="fields"
+                        label="Fields Available"
+                        source-label="Available"
+                        selected-label="Selected"
+                        field-level-help="Select the fields to display in Data Table"
+                        options={fieldOptions}
+                        value={selected}
+                        onchange={handleChange}>
+                    </lightning-dual-listbox>
+                </div>
+
+                <!-- Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
+                    <lightning-button variant="brand" label="Save" onclick={saveSelection}></lightning-button>
+                </footer>
+
+            </div>
+        </section>
+
+        <!-- Backdrop -->
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

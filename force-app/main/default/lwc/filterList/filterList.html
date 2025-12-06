@@ -1,0 +1,25 @@
+<template>
+    <div class="slds-card card">
+        <div class="filter-body">
+            <div class="filter-section">
+                <p>{addConditionData}</p>
+                <template for:each={filterData} for:item="record" for:index="index">
+                    <div key={record} class="filter-item">
+                        <span class="filter-items-order">{record.orderNo}.</span>
+                        <div class="filter-condition-body">
+                            <div class="filter-condition" title={record.filter}>{record.filter}
+                            </div>
+                            <lightning-button-icon icon-name="utility:edit" variant="bare" data-index={index}
+                                onclick={handleEditFilterItem} size="medium"></lightning-button-icon>
+                            <lightning-button-icon icon-name="utility:close" variant="bare"
+                                alternative-text={labels.CLOSE_FILTER} data-index={index}
+                                onclick={handleCloseFilterItem} size="medium"
+                                title={labels.CLOSE_FILTER}></lightning-button-icon>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+</template>

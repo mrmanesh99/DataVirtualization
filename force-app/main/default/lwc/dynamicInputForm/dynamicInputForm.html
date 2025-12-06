@@ -1,0 +1,81 @@
+<template>
+    <div>
+        <!-- Form Fields -->
+        <div>
+            <div class="slds-grid slds-wrap">
+                <template if:true={localModalFields.formFields} for:each={localModalFields.formFields} for:item="field">
+                    <template if:true={field.isInput}>
+                        <div key={field.name} class={field.gridSize}>
+                            <lightning-input label={field.label} data-field={field.name} placeholder={field.placeholder}
+                                value={field.value} type={field.type} disabled={field.disabled} title={field.value}
+                                read-only={field.readOnly} required={field.required} autocomplete="off"
+                                formatter={field.formatter} step={field.step} onchange={handleInputChange}>
+                            </lightning-input>
+                        </div>
+                    </template>
+
+                    <template if:true={field.isCombobox}>
+                        <div key={field.name} class={field.gridSize}>
+                            <lightning-combobox label={field.label} data-field={field.name} title={field.value}
+                                placeholder={field.placeholder} value={field.value} options={field.options}
+                                disabled={field.disabled} read-only={field.readOnly} required={field.required}
+                                onchange={handleInputChange}>
+                            </lightning-combobox>
+                        </div>
+                    </template>
+
+                    <template if:true={field.isTextarea}>
+                        <div key={field.name} class={field.gridSize}>
+                            <lightning-textarea label={field.label} data-field={field.name} title={field.value}
+                                placeholder={field.placeholder} value={field.value} disabled={field.disabled}
+                                read-only={field.readOnly} required={field.required} onchange={handleInputChange}>
+                            </lightning-textarea>
+                        </div>
+                    </template>
+
+                    <template if:true={field.isMultiSelect}>
+                        <div key={field.name} class={field.gridSize}>
+                            <c-custom-multi-picklist label={field.label} data-field={field.name}
+                                selected-values={field.value} placeholder={field.label} options={field.options}
+                                is-required={field.required} is-disabled={field.disabled}
+                                onvaluechange={handleMultiValueChange}>
+                            </c-custom-multi-picklist>
+                        </div>
+                    </template>
+
+                    <template if:true={field.isSearchable}>
+                        <div key={field.name} class={field.gridSize}>
+                            <c-searchable-dropdown label={field.label} data-field={field.name}
+                                selected-value={field.value} placeholder={field.placeholder} options={field.options}
+                                is-required={field.required} is-disabled={field.disabled} is-read-only={field.readOnly}
+                                onselect={handleSearchValueChange} onclear={handleSearchValueChange}>
+                            </c-searchable-dropdown>
+                        </div>
+                    </template>
+
+                    <template if:true={field.isToggle}>
+                        <div key={field.name} class={field.gridSize}>
+                            <div class="slds-form-element">
+                                <label class="slds-checkbox_toggle slds-grid slds-grid_align-spread"
+                                    style={field.containerStyle}>
+                                    <span class="toggleLabel slds-form-element__label slds-m-bottom_none"
+                                        style={field.labelStyle}>
+                                        {field.label}
+                                    </span>
+                                    <span style={field.toggleSpanStyle}>
+                                        <input type="checkbox" data-field={field.name} value={field.name}
+                                            onchange={handleToggleChange} checked={field.checked}
+                                            disabled={field.disabled} aria-describedby={field.name} />
+                                        <span id={field.name} class="slds-checkbox_faux_container">
+                                            <span class="slds-checkbox_faux"></span>
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>
