@@ -94,9 +94,9 @@ export default class dataTable extends LightningElement {
     _editableReapplied = false;
 
     // nested JSON (from JSON_Store__c) for persistence
-    @track nestedData = []; // <--- IMPORTANT: original nested JSON lives here
+    @track nestedData = []; // <- REAL original JSON lives here
 
-    // modal / record view state (from parent logic)
+    // modal / record view state
     @track showModal = false;
     @track mode = 'view';
     @track modalHeader = '';
@@ -109,6 +109,9 @@ export default class dataTable extends LightningElement {
 
     @track recordToEdit = null;
 
+    // -------------------------
+    // lifecycle
+    // -------------------------
     connectedCallback() {
         console.log('dataTable component loaded');
         this.loadConfig();
@@ -355,65 +358,56 @@ export default class dataTable extends LightningElement {
         });
     }
 
+    // 🔥 MAIN EDIT SAVE LOGIC
     async handleDynamicSave() {
-    try {
-        if (!this.dynamicFormFields || !Array.isArray(this.dynamicFormFields.formFields)) {
-            this.showToast('Error', 'No form data to save', 'error');
-            return;
+        try {
+            if (!this.dynamicFormFields || !Array.isArray(this.dynamicFormFields.formFields)) {
+                this.showToast('Error', 'No form data to save', 'error');
+                return;
+            }
+
+            // 1) Build map of changes using flattened paths, e.g. "!profile.contact.phone"
+            const changes = {};
+            for (const f of this.dynamicFormFields.formFields) {
+                changes[f.name] = f.value;
+            }
+
+            // 2) Update flattened table row
+            const idx = this.findRowIndexById(this.recordToEdit || changes);
+
+            if (idx === -1) {
+                const idx2 = this.tableData.findIndex(r => this.keysMatchId(r, changes));
+                if (idx2 >= 0) {
+                    this.tableData[idx2] = { ...this.tableData[idx2], ...changes };
+                } else {
+                    this.showToast('Warning', 'Could not find row to update, UI unchanged', 'warning');
+                    this.showDynamicModal = false;
+                    return;
+                }
+            } else {
+                this.tableData[idx] = { ...this.tableData[idx], ...changes };
+            }
+
+            this._originalRows = [...this.tableData];
+            this.updatePaginatedData();
+
+            // 3) Apply same changes into ORIGINAL nested JSON (this.nestedData)
+            this.applyChangesToNested(changes);
+
+            // 4) Persist nested JSON to Salesforce
+            await this.saveJSONToServer();
+
+            // 5) Reset modal
+            this.showDynamicModal = false;
+            this.dynamicFormFields = null;
+            this.recordToEdit = null;
+
+            this.showToast('Success', 'Record updated successfully', 'success');
+        } catch (err) {
+            console.error('handleDynamicSave error', err);
+            this.showToast('Error', 'Failed to save changes', 'error');
         }
-
-        // 1️⃣ Build a map of field changes
-        const changes = {};
-        for (const f of this.dynamicFormFields.formFields) {
-            changes[f.name] = f.value;
-        }
-
-        // 2️⃣ Update the flatten row in table immediately
-        const idx = this.findRowIndexById(this.recordToEdit || changes);
-
-        if (idx >= 0) {
-            this.tableData[idx] = { ...this.tableData[idx], ...changes };
-        }
-
-        this._originalRows = [...this.tableData];
-        this.updatePaginatedData();
-
-        // 3️⃣ Update nested JSON (this._nestedRows)
-        const rowId = this.recordToEdit["!id"] || this.recordToEdit.id;
-
-        let nestedRow = this._nestedRows.find(r =>
-            String(r.id) === String(rowId)
-        );
-
-        if (!nestedRow) {
-            console.error("Nested record not found", rowId);
-            this.showToast("Error", "Record not found in JSON Store", "error");
-            return;
-        }
-
-        // Write each field change into nested JSON using YOUR setValue()
-        for (let path in changes) {
-            this.setValue(nestedRow, path, changes[path]);
-        }
-
-        // 4️⃣ Save final nested JSON to Salesforce
-        await saveJSONStore({
-            updatedJson: JSON.stringify(this._nestedRows)
-        });
-
-        // 5️⃣ Reset UI state
-        this.showDynamicModal = false;
-        this.dynamicFormFields = null;
-        this.recordToEdit = null;
-
-        this.showToast('Success', 'Record updated successfully', 'success');
-
-    } catch (err) {
-        console.error('Save error', err);
-        this.showToast('Error', 'Failed to save changes', 'error');
     }
-}
-
 
     handleDynamicCancel() {
         this.showDynamicModal = false;
@@ -451,11 +445,12 @@ export default class dataTable extends LightningElement {
             return;
         }
 
+        // Remove from flattened table data
         this.tableData = this.tableData.filter(r => !this.keysMatchId(r, this.recordToDelete));
         this.updatePaginatedData();
         this._originalRows = [...this.tableData];
 
-        // remove from nested JSON & save
+        // Remove from nested JSON & save
         this.removeFromNested(this.recordToDelete);
         await this.saveJSONToServer();
 
@@ -609,21 +604,21 @@ export default class dataTable extends LightningElement {
     async fetchRecords() {
         console.log('Fetch Records');
         try {
-            // 1) Get flattened rows for the table from Apex (Apex will read nested JSON and flatten it)
+            // 1) Flatten data for table (Apex flattens from JSON_Store__c for you)
             const data = await getAPIData({
                 dataSchemaJson: this.rawDataSchemaConfig
             });
 
-            // 2) Load nested JSON separately for persistence
-            let storedJson = await getJSONStore();
-            if (storedJson) {
-                try {
+            // 2) Load original nested JSON from JSON_Store__c separately
+            try {
+                const storedJson = await getJSONStore();
+                if (storedJson) {
                     this.nestedData = JSON.parse(storedJson);
-                } catch (e) {
-                    console.error('Invalid JSON in JSON_Store__c', e);
+                } else {
                     this.nestedData = [];
                 }
-            } else {
+            } catch (e) {
+                console.error('Invalid JSON in JSON_Store__c', e);
                 this.nestedData = [];
             }
 
@@ -654,6 +649,7 @@ export default class dataTable extends LightningElement {
     async loadData() {
         try {
             let data = [];
+            // placeholder if you use other sources later
         } catch (error) {
             console.error('Error loading list view data:', error);
         }
@@ -885,7 +881,7 @@ export default class dataTable extends LightningElement {
     }
 
     // -------------------------
-    // Mass Delete (uses nested save now)
+    // Mass Delete (uses nested save)
     // -------------------------
     async handleMassDelete() {
         if (!this.selectedRows || this.selectedRows.length === 0) {
@@ -897,13 +893,14 @@ export default class dataTable extends LightningElement {
         const matchRow = (a, b) =>
             idKeys.some(k => a[k] && b[k] && String(a[k]) === String(b[k]));
 
+        // Remove from flattened data
         this.tableData = this.tableData.filter(
             row => !this.selectedRows.some(sel => matchRow(row, sel))
         );
         this._originalRows = [...this.tableData];
         this.updatePaginatedData();
 
-        // remove from nested JSON
+        // Remove from nested JSON
         const idsToDelete = this.selectedRows
             .map(r => r['!id'] || r.Id || r.id || r.RecordId)
             .filter(v => v !== undefined && v !== null)
@@ -919,17 +916,20 @@ export default class dataTable extends LightningElement {
 
         this.showToast('Success', 'Records deleted.', 'success');
     }
+
+    // -------------------------
+    // extra helpers (your original ones)
+    // -------------------------
     getValue(obj, path) {
-    return path.substring(1).split('.').reduce((o, key) => o?.[key], obj);
-}
-
-setValue(obj, path, value) {
-    const parts = path.substring(1).split('.');
-    let cur = obj;
-    for (let i = 0; i < parts.length - 1; i++) {
-        cur = cur[parts[i]];
+        return path.substring(1).split('.').reduce((o, key) => o?.[key], obj);
     }
-    cur[parts[parts.length - 1]] = value;
-}
 
+    setValue(obj, path, value) {
+        const parts = path.substring(1).split('.');
+        let cur = obj;
+        for (let i = 0; i < parts.length - 1; i++) {
+            cur = cur[parts[i]];
+        }
+        cur[parts[parts.length - 1]] = value;
+    }
 }
