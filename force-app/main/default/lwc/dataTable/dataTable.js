@@ -3,6 +3,9 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getUIConfig from '@salesforce/apex/UIConfigController.getUIConfig';
 import getAPIData from '@salesforce/apex/UIConfigController.getAPIData';
 import buildUIData from '@salesforce/apex/UIConfigController.buildUIData';
+import getAssignableUsers from '@salesforce/apex/UIConfigController.getAssignableUsers';
+import sendBulkEmail from '@salesforce/apex/UIConfigController.sendBulkEmail';
+
 
 export default class dataTable extends LightningElement {
     // -------------------------
@@ -24,6 +27,12 @@ export default class dataTable extends LightningElement {
     // -------------------------
     // tracked state
     // -------------------------
+    @track actionButtons = [];   // you’re already using this in loadConfig
+    @track showSendEmailModal = false;
+    @track emailRecipients = [];
+    @track emailSubject = '';
+    @track emailBody = '';
+
     @track tableEmptyMessage = 'No Records Found';
     @track tableData = [];          // active, filtered data used by datatable/pagination
     @track paginatedData = [];      // sliced page data
@@ -551,4 +560,208 @@ export default class dataTable extends LightningElement {
         // shrink table when filter panel is visible
         return this.showFilterPanel ? 'slds-col slds-size_2-of-3 data-table-div' : 'slds-col slds-size_1-of_1 data-table-div';
     }
+    handleButtonClick(event) {
+    const actionName = event.target.dataset.id;
+    console.log('TOP ACTION CLICKED:', actionName);
+
+    switch (actionName) {
+
+        case 'Assign_Owner':
+            this.handleAssignOwnerClick();
+            break;
+
+        case 'Export_To_Excel':
+            this.exportToExcel();
+            break;
+
+        case 'Send_Email':
+            this.handleSendEmailClick();
+            break;
+
+        case 'Delete_Records':
+            // we’ll do mass delete later
+            this.showToast('Info', 'Mass delete not implemented yet', 'info');
+            break;
+
+        default:
+            console.warn('Unknown header action:', actionName);
+    }
+}
+async handleAssignOwnerClick() {
+    if (!this.selectedRows || this.selectedRows.length === 0) {
+        this.showToast('Warning', 'Select at least one row to assign owner.', 'warning');
+        return;
+    }
+
+    try {
+        // Load user options only once
+        if (!this.userOptions || this.userOptions.length === 0) {
+            const users = await getAssignableUsers();
+            this.userOptions = users; // already [{ label, value }]
+        }
+
+        this.showAssignOwnerModal = true;
+    } catch (e) {
+        console.error('Error loading assignable users', e);
+        this.showToast('Error', e.body?.message || e.message || 'Failed to load users', 'error');
+    }
+}
+handleOwnerChange(event) {
+    this.selectedOwnerId = event.detail.value;
+}
+closeAssignOwnerModal() {
+    this.showAssignOwnerModal = false;
+    this.selectedOwnerId = null;
+}
+assignOwnerToRecord() {
+    if (!this.selectedOwnerId) {
+        this.showToast('Warning', 'Please select a new owner.', 'warning');
+        return;
+    }
+
+    if (!this.selectedRows || this.selectedRows.length === 0) {
+        this.showToast('Warning', 'No rows selected.', 'warning');
+        return;
+    }
+
+    // Just to show in logs / to future-proof
+    const ownerOption = (this.userOptions || []).find(u => u.value === this.selectedOwnerId);
+    const ownerName = ownerOption ? ownerOption.label : 'Selected Owner';
+
+    // For now, we just update in-memory rows (tableData + _originalRows)
+    const idKeys = ['!id', 'RecordId', 'Id', 'id'];
+
+    const matchRow = (a, b) =>
+        idKeys.some(k => a[k] !== undefined && b[k] !== undefined && String(a[k]) === String(b[k]));
+
+    this.tableData = this.tableData.map(row => {
+        const isSelected = this.selectedRows.some(sel => matchRow(row, sel));
+        if (!isSelected) return row;
+
+        // attach owner info in UI only; not shown in table until you add columns
+        return {
+            ...row,
+            OwnerId: this.selectedOwnerId,
+            OwnerName: ownerName
+        };
+    });
+
+    this._originalRows = this._originalRows.map(row => {
+        const isSelected = this.selectedRows.some(sel => matchRow(row, sel));
+        if (!isSelected) return row;
+
+        return {
+            ...row,
+            OwnerId: this.selectedOwnerId,
+            OwnerName: ownerName
+        };
+    });
+
+    this.updatePaginatedData();
+
+    this.showToast('Success', `Owner ${ownerName} assigned to ${this.selectedRows.length} record(s).`, 'success');
+    this.closeAssignOwnerModal();
+}
+exportToExcel() {
+    try {
+        if (!this.tableData || this.tableData.length === 0) {
+            this.showToast('Info', 'No data to export.', 'info');
+            return;
+        }
+
+        const exportColumns = (this.columns || []).filter(col => col.type !== 'action');
+
+        const headerRow = exportColumns.map(col => `"${col.label || ''}"`).join(',');
+
+        const dataRows = this.tableData.map(row => {
+            return exportColumns.map(col => {
+                let val = row[col.fieldName] || '';
+                val = String(val).replace(/"/g, '""');
+                return `"${val}"`;
+            }).join(',');
+        });
+
+        const csvContent = [headerRow, ...dataRows].join('\n');
+
+        // IMPORTANT: SAFE MIME TYPE
+        const blob = new Blob([csvContent], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+
+        // CSV extension still allowed
+        link.download = (this.headerName || 'data') + '.csv';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+
+    } catch (e) {
+        console.error('Export error', e);
+        this.showToast('Error', e.message || 'Failed to export', 'error');
+    }
+}
+
+handleSendEmailClick() {
+    if (!this.selectedRows || this.selectedRows.length === 0) {
+        this.showToast('Warning', 'Select at least one row to send email.', 'warning');
+        return;
+    }
+
+    // Collect unique emails from selected rows
+    const emailFieldPath = '!profile.contact.email';
+    const emails = Array.from(new Set(
+        this.selectedRows
+            .map(r => r[emailFieldPath])
+            .filter(e => !!e)
+    ));
+
+    if (!emails.length) {
+        this.showToast('Warning', 'No email addresses found on selected rows.', 'warning');
+        return;
+    }
+
+    this.emailRecipients = emails;
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.showSendEmailModal = true;
+}
+handleEmailSubjectChange(event) {
+    this.emailSubject = event.detail.value;
+}
+
+handleEmailBodyChange(event) {
+    this.emailBody = event.detail.value;
+}
+closeSendEmailModal() {
+    this.showSendEmailModal = false;
+    this.emailRecipients = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+}
+async sendEmailNow() {
+    try {
+        if (!this.emailRecipients || !this.emailRecipients.length) {
+            this.showToast('Warning', 'No recipients to send.', 'warning');
+            return;
+        }
+
+        await sendBulkEmail({
+            toAddresses: this.emailRecipients,
+            subject: this.emailSubject,
+            body: this.emailBody
+        });
+
+        this.showToast('Success', 'Email sent successfully.', 'success');
+        this.closeSendEmailModal();
+
+    } catch (e) {
+        console.error('sendEmailNow error', e);
+        this.showToast('Error', e.body?.message || e.message || 'Failed to send email', 'error');
+    }
+}
+
 }

@@ -1,6 +1,6 @@
 public with sharing class UIConfigController {
     
-    public static String jsonData = '[{"id":101,"profile":{"company":"ACME Industries","type":"Manufacturing","location":{"city":"Mumbai","country":"India"},"contact":{"phone":"+91-9876543210","email":"sales@acme.com"}}},{"id":102,"profile":{"company":"Globex Corporation","type":"Telecom","location":{"city":"Washington DC","country":"USA"},"contact":{"phone":"+1-202-555-0123","email":"contact@globex.com"}}},{"id":103,"profile":{"company":"Initech","type":"Software","location":{"city":"London","country":"UK"},"contact":{"phone":"+44-20-1234-1111","email":"support@initech.com"}}},{"id":104,"profile":{"company":"Umbrella Corp","type":"Biotech","location":{"city":"Tokyo","country":"Japan"},"contact":{"phone":"+81-3-9999-1111","email":"info@umbrella.co.jp"}}},{"id":105,"profile":{"company":"Wayne Enterprises","type":"Aerospace","location":{"city":"Gotham","country":"USA"},"contact":{"phone":"+1-212-444-0000","email":"corporate@wayne.com"}}},{"id":106,"profile":{"company":"Stark Industries","type":"Defense","location":{"city":"Los Angeles","country":"USA"},"contact":{"phone":"+1-310-555-2200","email":"info@starkindustries.com"}}},{"id":107,"profile":{"company":"Oscorp","type":"BioTech","location":{"city":"New York","country":"USA"},"contact":{"phone":"+1-646-505-0110","email":"contact@oscorp.com"}}},{"id":108,"profile":{"company":"Cyberdyne Systems","type":"AI Research","location":{"city":"San Jose","country":"USA"},"contact":{"phone":"+1-408-555-2099","email":"lab@cyberdyne.ai"}}},{"id":109,"profile":{"company":"Wonka Industries","type":"Food & Confectionery","location":{"city":"Zurich","country":"Switzerland"},"contact":{"phone":"+41-44-404-1000","email":"office@wonka.com"}}},{"id":110,"profile":{"company":"Tyrell Corporation","type":"Robotics","location":{"city":"Los Angeles","country":"USA"},"contact":{"phone":"+1-310-555-9090","email":"info@tyrell-corp.com"}}},{"id":111,"profile":{"company":"Aperture Science","type":"Research","location":{"city":"Detroit","country":"USA"},"contact":{"phone":"+1-313-867-3301","email":"help@aperturesci.com"}}},{"id":112,"profile":{"company":"Hooli","type":"Technology","location":{"city":"San Francisco","country":"USA"},"contact":{"phone":"+1-415-501-1221","email":"info@hooli.com"}}},{"id":113,"profile":{"company":"Pied Piper","type":"Compression","location":{"city":"Palo Alto","country":"USA"},"contact":{"phone":"+1-650-111-1212","email":"dev@piedpiper.com"}}},{"id":114,"profile":{"company":"Nakatomi Trading","type":"Finance","location":{"city":"Tokyo","country":"Japan"},"contact":{"phone":"+81-3-6868-0000","email":"contact@nakatomi.jp"}}},{"id":115,"profile":{"company":"Vandelay Industries","type":"Import/Export","location":{"city":"Boston","country":"USA"},"contact":{"phone":"+1-617-777-1001","email":"sales@vandelay.com"}}},{"id":116,"profile":{"company":"Freeman Labs","type":"Medical Research","location":{"city":"Seattle","country":"USA"},"contact":{"phone":"+1-206-555-2389","email":"lab@freemanlabs.org"}}},{"id":117,"profile":{"company":"Spacely Sprockets","type":"Mechanical","location":{"city":"Houston","country":"USA"},"contact":{"phone":"+1-713-901-0011","email":"sales@spacely.com"}}},{"id":118,"profile":{"company":"Blue Sun Corp","type":"Retail","location":{"city":"Beijing","country":"China"},"contact":{"phone":"+86-10-8800-1234","email":"info@bluesun.cn"}}},{"id":119,"profile":{"company":"Shinra Electric","type":"Energy","location":{"city":"Midgar","country":"Japan"},"contact":{"phone":"+81-3-7777-0000","email":"energy@shinra.jp"}}},{"id":120,"profile":{"company":"Hyperion","type":"Aerospace","location":{"city":"Sydney","country":"Australia"},"contact":{"phone":"+61-2-6001-0001","email":"info@hyperion.com.au"}}},{"id":121,"profile":{"company":"Black Mesa","type":"Research","location":{"city":"New Mexico","country":"USA"},"contact":{"phone":"+1-575-909-4500","email":"queries@blackmesa.gov"}}},{"id":122,"profile":{"company":"LexCorp","type":"Energy","location":{"city":"Metropolis","country":"USA"},"contact":{"phone":"+1-999-900-1200","email":"corp@lexcorp.com"}}},{"id":123,"profile":{"company":"Paper Street Soap Co.","type":"Manufacturing","location":{"city":"Los Angeles","country":"USA"},"contact":{"phone":"+1-213-888-0001","email":"hello@paperstreet.com"}}},{"id":124,"profile":{"company":"Big Kahuna Burger","type":"Food","location":{"city":"Honolulu","country":"USA"},"contact":{"phone":"+1-808-555-0101","email":"orders@bigkahuna.com"}}},{"id":125,"profile":{"company":"Monsters Inc.","type":"Energy","location":{"city":"San Diego","country":"USA"},"contact":{"phone":"+1-619-444-1212","email":"contact@monstersinc.com"}}},{"id":126,"profile":{"company":"Abstergo Industries","type":"Pharma","location":{"city":"Rome","country":"Italy"},"contact":{"phone":"+39-06-900-1111","email":"office@abstergo.org"}}},{"id":127,"profile":{"company":"Rapture Corp","type":"Energy","location":{"city":"Atlantis","country":"Unknown"},"contact":{"phone":"+0-999-000-1111","email":"admin@rapture.co"}}},{"id":128,"profile":{"company":"Vault-Tec","type":"Defense","location":{"city":"Las Vegas","country":"USA"},"contact":{"phone":"+1-702-901-1000","email":"info@vault-tec.com"}}},{"id":129,"profile":{"company":"Dragon Motors","type":"Automobile","location":{"city":"Shanghai","country":"China"},"contact":{"phone":"+86-21-5300-4555","email":"sales@dragonmotors.cn"}}},{"id":130,"profile":{"company":"Atlas Corp","type":"Logistics","location":{"city":"Dubai","country":"UAE"},"contact":{"phone":"+971-4-930-2000","email":"business@atlas.ae"}}}]';
+    public static String jsonData = '[{"id":101,"profile":{"company":"ACME Industries","type":"Manufacturing","location":{"city":"Mumbai","country":"India"},"contact":{"phone":"+91-9876543210","email":"maneshsf99@gmail.com"}}},{"id":102,"profile":{"company":"Globex Corporation","type":"Telecom","location":{"city":"Washington DC","country":"USA"},"contact":{"phone":"+1-202-555-0123","email":"contact@globex.com"}}},{"id":103,"profile":{"company":"Initech","type":"Software","location":{"city":"London","country":"UK"},"contact":{"phone":"+44-20-1234-1111","email":"support@initech.com"}}},{"id":104,"profile":{"company":"Umbrella Corp","type":"Biotech","location":{"city":"Tokyo","country":"Japan"},"contact":{"phone":"+81-3-9999-1111","email":"info@umbrella.co.jp"}}},{"id":105,"profile":{"company":"Wayne Enterprises","type":"Aerospace","location":{"city":"Gotham","country":"USA"},"contact":{"phone":"+1-212-444-0000","email":"corporate@wayne.com"}}},{"id":106,"profile":{"company":"Stark Industries","type":"Defense","location":{"city":"Los Angeles","country":"USA"},"contact":{"phone":"+1-310-555-2200","email":"info@starkindustries.com"}}},{"id":107,"profile":{"company":"Oscorp","type":"BioTech","location":{"city":"New York","country":"USA"},"contact":{"phone":"+1-646-505-0110","email":"contact@oscorp.com"}}},{"id":108,"profile":{"company":"Cyberdyne Systems","type":"AI Research","location":{"city":"San Jose","country":"USA"},"contact":{"phone":"+1-408-555-2099","email":"lab@cyberdyne.ai"}}},{"id":109,"profile":{"company":"Wonka Industries","type":"Food & Confectionery","location":{"city":"Zurich","country":"Switzerland"},"contact":{"phone":"+41-44-404-1000","email":"office@wonka.com"}}},{"id":110,"profile":{"company":"Tyrell Corporation","type":"Robotics","location":{"city":"Los Angeles","country":"USA"},"contact":{"phone":"+1-310-555-9090","email":"info@tyrell-corp.com"}}},{"id":111,"profile":{"company":"Aperture Science","type":"Research","location":{"city":"Detroit","country":"USA"},"contact":{"phone":"+1-313-867-3301","email":"help@aperturesci.com"}}},{"id":112,"profile":{"company":"Hooli","type":"Technology","location":{"city":"San Francisco","country":"USA"},"contact":{"phone":"+1-415-501-1221","email":"info@hooli.com"}}},{"id":113,"profile":{"company":"Pied Piper","type":"Compression","location":{"city":"Palo Alto","country":"USA"},"contact":{"phone":"+1-650-111-1212","email":"dev@piedpiper.com"}}},{"id":114,"profile":{"company":"Nakatomi Trading","type":"Finance","location":{"city":"Tokyo","country":"Japan"},"contact":{"phone":"+81-3-6868-0000","email":"contact@nakatomi.jp"}}},{"id":115,"profile":{"company":"Vandelay Industries","type":"Import/Export","location":{"city":"Boston","country":"USA"},"contact":{"phone":"+1-617-777-1001","email":"sales@vandelay.com"}}},{"id":116,"profile":{"company":"Freeman Labs","type":"Medical Research","location":{"city":"Seattle","country":"USA"},"contact":{"phone":"+1-206-555-2389","email":"lab@freemanlabs.org"}}},{"id":117,"profile":{"company":"Spacely Sprockets","type":"Mechanical","location":{"city":"Houston","country":"USA"},"contact":{"phone":"+1-713-901-0011","email":"sales@spacely.com"}}},{"id":118,"profile":{"company":"Blue Sun Corp","type":"Retail","location":{"city":"Beijing","country":"China"},"contact":{"phone":"+86-10-8800-1234","email":"info@bluesun.cn"}}},{"id":119,"profile":{"company":"Shinra Electric","type":"Energy","location":{"city":"Midgar","country":"Japan"},"contact":{"phone":"+81-3-7777-0000","email":"energy@shinra.jp"}}},{"id":120,"profile":{"company":"Hyperion","type":"Aerospace","location":{"city":"Sydney","country":"Australia"},"contact":{"phone":"+61-2-6001-0001","email":"info@hyperion.com.au"}}},{"id":121,"profile":{"company":"Black Mesa","type":"Research","location":{"city":"New Mexico","country":"USA"},"contact":{"phone":"+1-575-909-4500","email":"queries@blackmesa.gov"}}},{"id":122,"profile":{"company":"LexCorp","type":"Energy","location":{"city":"Metropolis","country":"USA"},"contact":{"phone":"+1-999-900-1200","email":"corp@lexcorp.com"}}},{"id":123,"profile":{"company":"Paper Street Soap Co.","type":"Manufacturing","location":{"city":"Los Angeles","country":"USA"},"contact":{"phone":"+1-213-888-0001","email":"hello@paperstreet.com"}}},{"id":124,"profile":{"company":"Big Kahuna Burger","type":"Food","location":{"city":"Honolulu","country":"USA"},"contact":{"phone":"+1-808-555-0101","email":"orders@bigkahuna.com"}}},{"id":125,"profile":{"company":"Monsters Inc.","type":"Energy","location":{"city":"San Diego","country":"USA"},"contact":{"phone":"+1-619-444-1212","email":"contact@monstersinc.com"}}},{"id":126,"profile":{"company":"Abstergo Industries","type":"Pharma","location":{"city":"Rome","country":"Italy"},"contact":{"phone":"+39-06-900-1111","email":"office@abstergo.org"}}},{"id":127,"profile":{"company":"Rapture Corp","type":"Energy","location":{"city":"Atlantis","country":"Unknown"},"contact":{"phone":"+0-999-000-1111","email":"admin@rapture.co"}}},{"id":128,"profile":{"company":"Vault-Tec","type":"Defense","location":{"city":"Las Vegas","country":"USA"},"contact":{"phone":"+1-702-901-1000","email":"info@vault-tec.com"}}},{"id":129,"profile":{"company":"Dragon Motors","type":"Automobile","location":{"city":"Shanghai","country":"China"},"contact":{"phone":"+86-21-5300-4555","email":"sales@dragonmotors.cn"}}},{"id":130,"profile":{"company":"Atlas Corp","type":"Logistics","location":{"city":"Dubai","country":"UAE"},"contact":{"phone":"+971-4-930-2000","email":"business@atlas.ae"}}}]';
 
     // Deserialize
     Object parsed = JSON.deserializeUntyped(jsonData);
@@ -323,6 +323,56 @@ public static List<Map<String,Object>> getAPIData(String dataSchemaJson) {
 
     return output;
 }
+@AuraEnabled(cacheable=true)
+public static List<Map<String, String>> getAssignableUsers() {
+    List<Map<String, String>> results = new List<Map<String, String>>();
+
+    for (User u : [
+        SELECT Id, Name
+        FROM User
+        WHERE IsActive = true
+        ORDER BY Name
+        LIMIT 200
+    ]) {
+        Map<String, String> m = new Map<String, String>();
+        m.put('label', u.Name);
+        m.put('value', String.valueOf(u.Id));
+        results.add(m);
+    }
+    return results;
+}
+
+@AuraEnabled
+public static void sendBulkEmail(List<String> toAddresses, String subject, String body) {
+    if (toAddresses == null || toAddresses.isEmpty()) {
+        throw new AuraHandledException('No recipients specified.');
+    }
+
+    if (String.isBlank(subject)) {
+        subject = 'Notification';
+    }
+    if (String.isBlank(body)) {
+        body = ' ';
+    }
+
+    List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
+
+    for (String addr : toAddresses) {
+        if (String.isBlank(addr)) continue;
+
+        Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+        email.setToAddresses(new List<String>{ addr });
+        email.setSubject(subject);
+        email.setPlainTextBody(body);
+        emails.add(email);
+    }
+
+    if (!emails.isEmpty()) {
+        Messaging.sendEmail(emails);
+    }
+}
+
+
 
 
 

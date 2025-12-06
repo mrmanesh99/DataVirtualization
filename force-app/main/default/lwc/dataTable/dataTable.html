@@ -283,4 +283,50 @@
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
+    <!-- Send Email Modal -->
+<template if:true={showSendEmailModal}>
+    <section class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <!-- Header -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close" title="Close"
+                    onclick={closeSendEmailModal}>
+                    <lightning-icon icon-name="utility:close" variant="inverse" size="x-small"></lightning-icon>
+                </button>
+                <h2 class="slds-text-heading_medium">Send Email</h2>
+                <p class="slds-m-top_x-small slds-text-body_small">
+                    Recipients:
+                    <template for:each={emailRecipients} for:item="addr">
+                        <span key={addr} class="slds-badge slds-m-right_x-small">{addr}</span>
+                    </template>
+                </p>
+            </header>
+
+            <!-- Content -->
+            <div class="slds-modal__content slds-p-around_medium">
+                <lightning-input
+                    type="text"
+                    label="Subject"
+                    value={emailSubject}
+                    onchange={handleEmailSubjectChange}>
+                </lightning-input>
+
+                <lightning-textarea
+                    class="slds-m-top_medium"
+                    label="Body"
+                    value={emailBody}
+                    onchange={handleEmailBodyChange}>
+                </lightning-textarea>
+            </div>
+
+            <!-- Footer -->
+            <footer class="slds-modal__footer" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <lightning-button variant="neutral" label="Cancel" onclick={closeSendEmailModal}></lightning-button>
+                <lightning-button variant="brand" label="Send" onclick={sendEmailNow}></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
 </template>
