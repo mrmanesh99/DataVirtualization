@@ -111,7 +111,7 @@
         <!-- DataTable -->
         <div class="slds-grid slds-wrap slds-m-top_small" id="table-container">
             <div class={datatableClass}>
-                <lightning-datatable key-field="Id" data={paginatedData} columns={columns} show-row-number-column
+                <lightning-datatable key-field="!id" data={paginatedData} columns={columns} show-row-number-column
                     draft-values={draftValues} onsave={handleSave} oncancel={handleCancelInlineEdits}
                     onrowaction={handleRowAction} onrowselection={handleRowSelection}
                     onheaderaction={handleHeaderAction} sorted-by={sortedBy} sorted-direction={sortedDirection}
@@ -195,9 +195,25 @@
 
                     <div class="slds-modal__content slds-p-around_medium">
                         <template if:true={dynamicFormFields}>
-                            <c-dynamic-input-form modal-fields={dynamicFormFields} onfieldinput={handleFieldInput}>
-                            </c-dynamic-input-form>
-                        </template>
+
+    <template for:each={dynamicFormFields} for:item="f">
+        <div key={f.name} class="slds-m-bottom_small">
+
+            <lightning-input
+                label={f.label}
+                name={f.name}
+                data-name={f.name}
+                value={f.value}
+                type="text"
+                disabled={f.readOnly}
+                onchange={handleEditFieldChange}>
+            </lightning-input>
+
+        </div>
+    </template>
+
+</template>
+
                         <template if:false={dynamicFormFields}>
                             <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
                         </template>

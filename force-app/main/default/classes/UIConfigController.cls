@@ -302,6 +302,7 @@ public with sharing class UIConfigController {
         for (Object raw : jsonRows) {
             Map<String,Object> rowObj   = (Map<String,Object>)raw;
             Map<String,Object> finalRow = new Map<String,Object>();
+             finalRow.put('!id', rowObj.get('id'));
 
             for (Object colDef : cols) {
                 Map<String,Object> col = (Map<String,Object>)colDef;

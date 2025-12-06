@@ -298,116 +298,158 @@ export default class dataTable extends LightningElement {
     // -------------------------
     // dynamic EDIT modal
     // -------------------------
-    async openEditModal(row) {
-        try {
-            this.showDynamicModal = true;
+async openEditModal(row) {
+    try {
+        this.showDynamicModal = true;
+        this.recordToEdit = row;
+        this.editObjectName = row['!profile.company'] || '';
 
-            const data = await buildUIData({
-                dataSchemaJson: this.rawDataSchemaConfig
-            });
+        // Build field list from schema
+        const schema = JSON.parse(this.rawDataSchemaConfig);
+        const cols = schema.columns || [];
 
-            const record = data.find(d => {
-                return (d.fields || []).some(f => {
-                    return (
-                        (f.name === '!id' && f.value === row['!id']) ||
-                        (f.name === 'id' && f.value === row['id'])
-                    );
-                });
-            });
+        const fields = cols
+            .filter(c => c.fieldName && c.type !== 'action')
+            .map(c => ({
+                label: c.label,
+                name: c.fieldName,
+                value: row[c.fieldName],
+                readOnly: c.readOnly === true
+            }));
 
-            if (!record) {
-                const fallbackFields = Object.keys(row).map(k => ({
+        // Fallback if no schema matched
+        if (!fields.length) {
+            Object.keys(row).forEach(k => {
+                fields.push({
                     label: k,
                     name: k,
                     value: row[k],
-                    isInput: true,
-                    type: 'text'
-                }));
-                this.dynamicFormFields = { formFields: fallbackFields };
-                this.recordToEdit = row;
-                return;
-            }
-
-            this.dynamicFormFields = {
-                formFields: record.fields.map(f => ({
-                    ...f,
-                    value: row[f.name] !== undefined ? row[f.name] : f.value
-                }))
-            };
-
-            this.recordToEdit = row;
-            this.editObjectName = row['!profile.company'] || '';
-        } catch (err) {
-            console.error('openEditModal error', err);
-            this.showToast('Error', 'Failed to open edit modal', 'error');
+                    readOnly: false
+                });
+            });
         }
+
+        // FINAL: dynamicFormFields is now a SIMPLE ARRAY
+        this.dynamicFormFields = fields;
+
+    } catch (err) {
+        console.error("openEditModal error", err);
+        this.showToast("Error", "Failed to open edit modal", "error");
+    }
+}
+
+
+
+
+ handleFieldInput(event) {
+    console.log("FIELD INPUT EVENT:", JSON.parse(JSON.stringify(event.detail)));
+
+    const payload = event.detail || {};
+    const fieldName = payload.name || payload.fieldName;
+    const value = payload.value;
+
+    console.log("Updating:", fieldName, "=", value);
+
+    // dynamicFormFields is an OBJECT with formFields array
+    if (
+        !fieldName ||
+        !this.dynamicFormFields ||
+        !Array.isArray(this.dynamicFormFields.formFields)
+    ) {
+        console.log('handleFieldInput: invalid dynamicFormFields', this.dynamicFormFields);
+        return;
     }
 
-    handleFieldInput(event) {
-        const payload = event.detail || {};
-        const fieldName = payload.name || payload.fieldName;
-        const value = payload.value;
+    const updatedFields = this.dynamicFormFields.formFields.map(f => {
+        if (f.name === fieldName) {
+            console.log("Updated field:", f.name);
+            return { ...f, value };
+        }
+        return f;
+    });
 
-        if (!fieldName || !this.dynamicFormFields || !this.dynamicFormFields.formFields) return;
+    // reassign so LWC tracking picks up changes
+    this.dynamicFormFields = {
+        ...this.dynamicFormFields,
+        formFields: updatedFields
+    };
+}
+handleEditFieldChange(event) {
+    const fieldName = event.target.dataset.name;
+    const value = event.target.value;
 
-        this.dynamicFormFields.formFields = this.dynamicFormFields.formFields.map(f => {
-            if (f.name === fieldName) {
-                return { ...f, value };
-            }
-            return f;
-        });
-    }
+    if (!this.dynamicFormFields) return;
+
+    this.dynamicFormFields = this.dynamicFormFields.map(f => {
+        return f.name === fieldName ? { ...f, value } : f;
+    });
+
+    console.log("EDIT FIELD UPDATED:", fieldName, "=", value);
+}
+
+
 
     // 🔥 MAIN EDIT SAVE LOGIC
-    async handleDynamicSave() {
-        try {
-            if (!this.dynamicFormFields || !Array.isArray(this.dynamicFormFields.formFields)) {
-                this.showToast('Error', 'No form data to save', 'error');
-                return;
-            }
-
-            // 1) Build map of changes using flattened paths, e.g. "!profile.contact.phone"
-            const changes = {};
-            for (const f of this.dynamicFormFields.formFields) {
-                changes[f.name] = f.value;
-            }
-
-            // 2) Update flattened table row
-            const idx = this.findRowIndexById(this.recordToEdit || changes);
-
-            if (idx === -1) {
-                const idx2 = this.tableData.findIndex(r => this.keysMatchId(r, changes));
-                if (idx2 >= 0) {
-                    this.tableData[idx2] = { ...this.tableData[idx2], ...changes };
-                } else {
-                    this.showToast('Warning', 'Could not find row to update, UI unchanged', 'warning');
-                    this.showDynamicModal = false;
-                    return;
-                }
-            } else {
-                this.tableData[idx] = { ...this.tableData[idx], ...changes };
-            }
-
-            this._originalRows = [...this.tableData];
-            this.updatePaginatedData();
-
-            // 3) Apply same changes into ORIGINAL nested JSON (this.nestedData)
-            this.applyChangesToNested(changes);
-
-            // 4) Persist nested JSON to Salesforce
-            await this.saveJSONToServer();
-
-            // 5) Reset modal
-            this.showDynamicModal = false;
-            this.dynamicFormFields = null;
-            this.recordToEdit = null;
-
-            this.showToast('Success', 'Record updated successfully', 'success');
-        } catch (err) {
-            console.error('handleDynamicSave error', err);
-            this.showToast('Error', 'Failed to save changes', 'error');
+// 🔥 MAIN EDIT SAVE LOGIC
+async handleDynamicSave() {
+    try {
+        if (!this.dynamicFormFields || !Array.isArray(this.dynamicFormFields)) {
+            console.error("dynamicFormFields invalid:", this.dynamicFormFields);
+            this.showToast("Error", "No form data found", "error");
+            return;
         }
+
+        if (!this.recordToEdit) {
+            console.error("recordToEdit is NULL");
+            this.showToast("Error", "No row selected", "error");
+            return;
+        }
+
+        // Build changes object
+        const changes = {};
+        this.dynamicFormFields.forEach(f => {
+            changes[f.name] = f.value;
+        });
+
+        console.log("Saving changes:", JSON.stringify(changes));
+
+        // Find row in flattened table data
+        const idx = this.findRowIndexById(this.recordToEdit);
+
+        if (idx === -1) {
+            this.showToast("Error", "Could not locate row", "error");
+            return;
+        }
+
+        // Update table row
+        this.tableData[idx] = { 
+            ...this.tableData[idx],
+            ...changes 
+        };
+
+        this._originalRows = [...this.tableData];
+        this.updatePaginatedData();
+
+        // Update nested JSON
+        this.applyChangesToNested(changes);
+
+        // Save to org
+        await this.saveJSONToServer();
+
+        // Close modal
+        this.showDynamicModal = false;
+        this.dynamicFormFields = null;
+        this.recordToEdit = null;
+
+        this.showToast("Success", "Record updated", "success");
+
+    } catch (err) {
+        console.error("handleDynamicSave error:", err);
+        this.showToast("Error", "Failed to save record", "error");
     }
+}
+
+
 
     handleDynamicCancel() {
         this.showDynamicModal = false;
@@ -448,7 +490,7 @@ export default class dataTable extends LightningElement {
         // Remove from flattened table data
         this.tableData = this.tableData.filter(r => !this.keysMatchId(r, this.recordToDelete));
         this.updatePaginatedData();
-        this._originalRows = [...this.tableData];
+        this._originalRows = JSON.parse(JSON.stringify(this.tableData));
 
         // Remove from nested JSON & save
         this.removeFromNested(this.recordToDelete);
@@ -503,7 +545,7 @@ export default class dataTable extends LightningElement {
         const idx = this.nestedData.findIndex(rec => String(rec.id) === String(id));
         if (idx === -1) return;
 
-        const record = { ...this.nestedData[idx] };
+        const record = JSON.parse(JSON.stringify(this.nestedData[idx]));
 
         Object.keys(changes).forEach(key => {
             if (key === '!id' || key === 'Id' || key === 'id' || key === 'RecordId') {
@@ -699,7 +741,7 @@ export default class dataTable extends LightningElement {
     }
 
     // -------------------------
-    // Assign Owner (unchanged)
+    // Assign Owner
     // -------------------------
     async handleAssignOwnerClick() {
         if (!this.selectedRows || this.selectedRows.length === 0) {
@@ -750,21 +792,19 @@ export default class dataTable extends LightningElement {
         this.tableData = this.tableData.map(row => {
             const isSelected = this.selectedRows.some(sel => matchRow(row, sel));
             if (!isSelected) return row;
-            return {
-                ...row,
-                OwnerId: this.selectedOwnerId,
-                OwnerName: ownerName
-            };
+            const updated = JSON.parse(JSON.stringify(row));
+            updated.OwnerId = this.selectedOwnerId;
+            updated.OwnerName = ownerName;
+            return updated;
         });
 
         this._originalRows = this._originalRows.map(row => {
             const isSelected = this.selectedRows.some(sel => matchRow(row, sel));
             if (!isSelected) return row;
-            return {
-                ...row,
-                OwnerId: this.selectedOwnerId,
-                OwnerName: ownerName
-            };
+            const updated2 = JSON.parse(JSON.stringify(row));
+            updated2.OwnerId = this.selectedOwnerId;
+            updated2.OwnerName = ownerName;
+            return updated2;
         });
 
         this.updatePaginatedData();
@@ -774,7 +814,7 @@ export default class dataTable extends LightningElement {
     }
 
     // -------------------------
-    // Export to CSV (unchanged)
+    // Export to CSV
     // -------------------------
     exportToExcel() {
         try {
@@ -816,7 +856,7 @@ export default class dataTable extends LightningElement {
     }
 
     // -------------------------
-    // Send Email (unchanged)
+    // Send Email
     // -------------------------
     handleSendEmailClick() {
         if (!this.selectedRows || this.selectedRows.length === 0) {
@@ -897,7 +937,7 @@ export default class dataTable extends LightningElement {
         this.tableData = this.tableData.filter(
             row => !this.selectedRows.some(sel => matchRow(row, sel))
         );
-        this._originalRows = [...this.tableData];
+        this._originalRows = JSON.parse(JSON.stringify(this.tableData));
         this.updatePaginatedData();
 
         // Remove from nested JSON
@@ -918,7 +958,7 @@ export default class dataTable extends LightningElement {
     }
 
     // -------------------------
-    // extra helpers (your original ones)
+    // extra helpers
     // -------------------------
     getValue(obj, path) {
         return path.substring(1).split('.').reduce((o, key) => o?.[key], obj);
